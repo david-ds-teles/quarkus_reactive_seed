@@ -1,27 +1,22 @@
 package com.david.ds.teles.utils.exceptions;
 
+import com.david.ds.teles.utils.i18n.AppMessages;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import io.quarkus.logging.Log;
+import io.quarkus.qute.i18n.Localized;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import javax.inject.Inject;
 import javax.validation.ConstraintViolationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import org.jboss.resteasy.reactive.RestResponse;
 import org.jboss.resteasy.reactive.server.ServerExceptionMapper;
 
-import com.david.ds.teles.utils.i18n.AppMessages;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-
-import io.quarkus.logging.Log;
-import io.quarkus.qute.i18n.Localized;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-
 public class ExceptionsMapper {
-
 	@Inject
 	@Localized("pt-BR")
 	private AppMessages messages;
@@ -40,7 +35,6 @@ public class ExceptionsMapper {
 				violations);
 
 		return RestResponse.status(Response.Status.BAD_REQUEST, response);
-
 	}
 
 	@ServerExceptionMapper
@@ -79,6 +73,5 @@ public class ExceptionsMapper {
 			this.status = status;
 			this.statusCode = statusCode;
 		}
-
 	}
 }

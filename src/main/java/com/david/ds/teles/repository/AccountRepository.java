@@ -1,14 +1,11 @@
 package com.david.ds.teles.repository;
 
-import java.util.List;
-
-import javax.enterprise.context.ApplicationScoped;
-
 import com.david.ds.teles.core.domain.Account;
-
 import io.quarkus.hibernate.reactive.panache.PanacheRepository;
 import io.quarkus.panache.common.Sort;
 import io.smallrye.mutiny.Uni;
+import java.util.List;
+import javax.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
 public class AccountRepository implements PanacheRepository<Account> {
