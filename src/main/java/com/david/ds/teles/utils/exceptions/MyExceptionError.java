@@ -4,7 +4,6 @@ import lombok.Getter;
 
 @Getter
 public class MyExceptionError extends RuntimeException {
-
 	private static final long serialVersionUID = 408265269912771298L;
 	private int status = 400;
 
