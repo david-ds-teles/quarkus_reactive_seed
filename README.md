@@ -1,8 +1,39 @@
-# quarkus-seed Project
+# Author
 
-This project uses Quarkus, the Supersonic Subatomic Java Framework.
+**author**: David S Teles
 
-If you want to learn more about Quarkus, please visit its website: https://quarkus.io/ .
+**email**: david.ds.teles@gmail.com
+
+Hello, my name is David Teles. I'm a software engineer. You can find me on [Linkedin](https://www.linkedin.com/in/david-teles/?locale=en_US). 
+
+Feel free to send me a message.
+
+# About
+
+This is a starter point for quarkus reactive projects. It has basic examples and configurations that you maybe want in your projects.
+
+You'll find here:
+
+* basic reactive project structure
+* example of layers communication using quarkus dependecy injection.
+* example of client consumer of api using quarkus rest client.
+* connection with mysql to show how entities and panache works.
+* i18n configurations as well as messages bundles to both quarkus and hibernate validation
+* prettier
+
+## Prettier
+
+This project has a maven plugin **prettier-maven-plugin** to help keep things neat. 
+
+to run prettier check in this project you can:
+```
+mvn prettier:check
+```
+
+to run prettier write in this project you can:
+```
+mvn write
+```
 
 ## Running the application in dev mode
 
@@ -46,7 +77,3 @@ Or, if you don't have GraalVM installed, you can run the native executable build
 You can then execute your native executable with: `./target/quarkus-seed-1.0.0-SNAPSHOT-runner`
 
 If you want to learn more about building native executables, please consult https://quarkus.io/guides/maven-tooling.
-# quarkus-reactive-seed
-A quarkus reactive seed project provided basic starting configuration 
-# quarkus-reactive-seed
-A quarkus reactive seed project provided basic starting configuration 

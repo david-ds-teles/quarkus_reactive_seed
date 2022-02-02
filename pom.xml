@@ -125,6 +125,27 @@
 					</systemPropertyVariables>
 				</configuration>
 			</plugin>
+			<!-->plugin to enforce code style to keep things neat</-->
+			<plugin>
+				<groupId>com.hubspot.maven.plugins</groupId>
+				<artifactId>prettier-maven-plugin</artifactId>
+				<version>0.7</version>
+				<configuration>
+					<printWidth>100</printWidth>
+					<tabWidth>2</tabWidth>
+					<useTabs>true</useTabs>
+					<ignoreConfigFile>true</ignoreConfigFile>
+					<ignoreEditorConfig>true</ignoreEditorConfig>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>validate</phase>
+						<goals>
+							<goal>write</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 	<profiles>
