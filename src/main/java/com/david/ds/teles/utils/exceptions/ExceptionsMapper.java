@@ -79,7 +79,7 @@ public class ExceptionsMapper {
 	@Data
 	@AllArgsConstructor
 	@JsonInclude(Include.NON_NULL)
-	private static class DefaultResponse {
+	static class DefaultResponse {
 		public String message;
 		public List<String> details;
 		public Response.Status status;

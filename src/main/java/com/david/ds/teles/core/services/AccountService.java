@@ -4,6 +4,7 @@ import com.david.ds.teles.core.domain.Account;
 import com.david.ds.teles.repository.AccountRepository;
 import com.david.ds.teles.utils.exceptions.MyExceptionError;
 import com.david.ds.teles.utils.i18n.AppMessages;
+import com.david.ds.teles.utils.logging.DefaultLogging.Logged;
 import com.david.ds.teles.utils.validator.MyValidatorGroups;
 import io.quarkus.hibernate.reactive.panache.Panache;
 import io.quarkus.logging.Log;
@@ -22,6 +23,7 @@ import javax.validation.groups.ConvertGroup;
 import javax.validation.groups.Default;
 
 @ApplicationScoped
+@Logged
 public class AccountService {
 	private Validator validator;
 
@@ -41,8 +43,6 @@ public class AccountService {
 
 	@Transactional
 	public Uni<Account> save(@Valid @ConvertGroup(to = Default.class) Account account) {
-		Log.info("starting save");
-
 		account.create(messages);
 
 		Uni<Account> result = Panache.withTransaction(
@@ -58,13 +58,10 @@ public class AccountService {
 			}
 		);
 
-		Log.info("ending save");
 		return result;
 	}
 
 	public Uni<Void> update(Account account) {
-		Log.info("starting update");
-
 		account.setUpdatedAt(OffsetDateTime.now());
 
 		Set<ConstraintViolation<Account>> violations =
@@ -74,25 +71,23 @@ public class AccountService {
 
 		Log.info("validation complete");
 
-		final String updateQuery =
-			"provider= '" +
-			account.getProvider() +
-			"', updatedAt='" +
-			account.getUpdatedAt().toString() +
-			"' where id = ?1";
+		Uni<Integer> updated =
+			this.accountRepo.update(
+					Queries.UPDATE,
+					account.getProvider(),
+					account.getUpdatedAt(),
+					account.getId()
+				);
 
-		Uni<Integer> updated = this.accountRepo.update(updateQuery, account.getId());
-
-		updated
+		Uni<Void> result = updated
 			.onFailure()
 			.transform(
 				e -> {
 					Log.error("error traying to update an account", e);
+
 					return new MyExceptionError(messages.failed_with("SQL Error"), 500);
 				}
-			);
-
-		Uni<Void> result = updated
+			)
 			.onItem()
 			.transformToUni(
 				qtdUpdated -> {
@@ -106,14 +101,15 @@ public class AccountService {
 				}
 			);
 
-		Log.info("ending update");
 		return result;
 	}
 
 	public Uni<List<Account>> findAll() {
-		Log.info("starting findAll");
 		Uni<List<Account>> result = this.accountRepo.getAll();
-		Log.info("ending findAll");
 		return result;
+	}
+
+	private static interface Queries {
+		public static final String UPDATE = "provider=?1, updatedAt=?2 where id = ?3";
 	}
 }
