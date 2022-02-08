@@ -9,6 +9,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
+import org.jboss.resteasy.reactive.ResponseStatus;
 
 @Path("/account")
 public class AccountApi {
@@ -26,6 +27,7 @@ public class AccountApi {
 	}
 
 	@POST
+	@ResponseStatus(201)
 	public Uni<Account> create(Account account) {
 		Uni<Account> result = service.save(account);
 		return result;

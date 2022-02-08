@@ -6,7 +6,7 @@ import com.david.ds.teles.utils.exceptions.MyExceptionError;
 import com.david.ds.teles.utils.i18n.AppMessages;
 import com.david.ds.teles.utils.logging.DefaultLogging.Logged;
 import com.david.ds.teles.utils.validator.MyValidatorGroups;
-import io.quarkus.hibernate.reactive.panache.Panache;
+import io.quarkus.hibernate.reactive.panache.common.runtime.ReactiveTransactional;
 import io.quarkus.logging.Log;
 import io.quarkus.qute.i18n.Localized;
 import io.smallrye.mutiny.Uni;
@@ -14,7 +14,6 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Set;
 import javax.enterprise.context.ApplicationScoped;
-import javax.transaction.Transactional;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
@@ -41,22 +40,19 @@ public class AccountService {
 		this.messages = messages;
 	}
 
-	@Transactional
+	@ReactiveTransactional
 	public Uni<Account> save(@Valid @ConvertGroup(to = Default.class) Account account) {
 		account.create(messages);
 
-		Uni<Account> result = Panache.withTransaction(
-			() -> {
-				return this.accountRepo.persist(account)
-					.onFailure()
-					.transform(
-						e -> {
-							Log.error("error traying to save an account", e);
-							return new MyExceptionError(messages.failed_with("SQL Error"), 500);
-						}
-					);
-			}
-		);
+		Uni<Account> result =
+			this.accountRepo.persist(account)
+				.onFailure()
+				.transform(
+					e -> {
+						Log.error("error traying to save an account", e);
+						return new MyExceptionError(messages.failed_with("SQL Error"), 500);
+					}
+				);
 
 		return result;
 	}
