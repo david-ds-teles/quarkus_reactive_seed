@@ -1,16 +1,13 @@
-package com.david.ds.teles.core.services;
+package com.david.ds.teles.test.core.services;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.is;
 
-import com.david.ds.teles.api.AccountApi;
 import com.david.ds.teles.core.domain.Account;
 import com.david.ds.teles.repository.AccountRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.junit.QuarkusMock;
-import io.quarkus.test.junit.QuarkusTest;
 import io.smallrye.mutiny.Uni;
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -19,9 +16,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-@QuarkusTest
-@TestHTTPEndpoint(AccountApi.class)
-public class AccountApiTest {
+public class AccountApiTest2 {
 	@Inject
 	AccountRepository repo;
 
