@@ -17,7 +17,13 @@ import org.testcontainers.containers.wait.strategy.Wait;
  */
 public class TestContainerResourceLifecycleManager implements QuarkusTestResourceLifecycleManager {
 	DockerComposeContainer<?> testInfra;
-	static final int DB_PORT = 3306;
+
+	/**
+	 * for some reason testcontainers doesn't look to exposed port, but to inner
+	 * container port.
+	 */
+	static final int DB_INNER_PORT = 3306;
+	static final int DB_PORT_FORWARD = 3360;
 
 	@SuppressWarnings("resource")
 	@Override
@@ -26,11 +32,11 @@ public class TestContainerResourceLifecycleManager implements QuarkusTestResourc
 
 		try {
 			testInfra =
-				new DockerComposeContainer<>(new File("docker-compose.yml"))
+				new DockerComposeContainer<>(new File("src/test/resources/test-docker-compose.yml"))
 				.withExposedService(
 						"mysql",
-						DB_PORT,
-						Wait.forListeningPort().withStartupTimeout(Duration.ofSeconds(20))
+						DB_INNER_PORT,
+						Wait.forListeningPort().withStartupTimeout(Duration.ofSeconds(30))
 					);
 
 			testInfra.start();
@@ -38,6 +44,11 @@ public class TestContainerResourceLifecycleManager implements QuarkusTestResourc
 			Log.info("test container started");
 
 			Map<String, String> conf = new HashMap<>();
+			conf.put(
+				"quarkus.datasource.reactive.url",
+				"mysql://localhost:" + DB_PORT_FORWARD + "/quarkus"
+			);
+
 			return conf;
 		} catch (Throwable e) {
 			Log.error("failed to start test container", e);
@@ -47,8 +58,8 @@ public class TestContainerResourceLifecycleManager implements QuarkusTestResourc
 
 	@Override
 	public void stop() {
-		System.out.println("stopping test container");
+		Log.info("stopping test container");
 		testInfra.stop();
-		System.out.println("test container stopped");
+		Log.info("test container stopped");
 	}
 }
