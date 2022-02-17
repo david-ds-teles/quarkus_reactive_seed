@@ -28,7 +28,10 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
+
 	<dependencies>
+
+	<!-- REACTIVE DEPENDENCIES-->
 		<dependency>
 			<groupId>io.quarkus</groupId>
 			<artifactId>quarkus-resteasy-reactive</artifactId>
@@ -37,7 +40,6 @@
 			<groupId>io.quarkus</groupId>
 			<artifactId>quarkus-resteasy-reactive-jackson</artifactId>
 		</dependency>
-
 		<dependency>
 			<groupId>io.quarkus</groupId>
 			<artifactId>quarkus-resteasy-reactive-qute</artifactId>
@@ -54,7 +56,6 @@
 			<groupId>io.quarkus</groupId>
 			<artifactId>quarkus-rest-client-reactive-jackson</artifactId>
 		</dependency>
-
 		<dependency>
 			<groupId>io.quarkus</groupId>
 			<artifactId>quarkus-reactive-mysql-client</artifactId>
@@ -64,14 +65,18 @@
 			<artifactId>quarkus-hibernate-reactive-panache</artifactId>
 		</dependency>
 
+
 		<dependency>
 			<groupId>io.quarkus</groupId>
 			<artifactId>quarkus-hibernate-validator</artifactId>
 		</dependency>
-
 		<dependency>
 			<groupId>io.quarkus</groupId>
 			<artifactId>quarkus-arc</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.quarkus</groupId>
+			<artifactId>quarkus-smallrye-health</artifactId>
 		</dependency>
 
 		<dependency>
@@ -80,6 +85,8 @@
 			<scope>provided</scope>
 			<version>${projectlombok.version}</version>
 		</dependency>
+
+		<!-- TEST -->
 		<dependency>
 			<groupId>io.quarkus</groupId>
 			<artifactId>quarkus-junit5</artifactId>
@@ -144,6 +151,7 @@
 				</configuration>
 			</plugin>
 		</plugins>
+
 		<pluginManagement>
 			<plugins>
 				<!-->plugin to enforce code style to keep things neat</-->
