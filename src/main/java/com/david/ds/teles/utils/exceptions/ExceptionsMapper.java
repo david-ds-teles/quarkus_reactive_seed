@@ -4,10 +4,8 @@ import com.david.ds.teles.utils.i18n.AppMessages;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import io.quarkus.logging.Log;
-import io.quarkus.qute.i18n.Localized;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.inject.Inject;
 import javax.validation.ConstraintViolationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -17,9 +15,11 @@ import org.jboss.resteasy.reactive.RestResponse;
 import org.jboss.resteasy.reactive.server.ServerExceptionMapper;
 
 public class ExceptionsMapper {
-	@Inject
-	@Localized("pt-BR")
 	private AppMessages messages;
+
+	public ExceptionsMapper(AppMessages messages) {
+		this.messages = messages;
+	}
 
 	@ServerExceptionMapper
 	public RestResponse<DefaultResponse> constraintViolation(ConstraintViolationException ex) {
@@ -32,7 +32,7 @@ public class ExceptionsMapper {
 			.collect(Collectors.toList());
 
 		DefaultResponse response = new DefaultResponse(
-			messages.invalid_data(),
+			messages.getMessage("invalid_data"),
 			violations,
 			Response.Status.BAD_REQUEST,
 			Response.Status.BAD_REQUEST.getStatusCode()
@@ -41,7 +41,7 @@ public class ExceptionsMapper {
 		Log.warnf(
 			"returning %s with response: %s to invalid data: %s",
 			response.status,
-			messages.invalid_data(),
+			messages.getMessage("invalid_data"),
 			violations
 		);
 
@@ -67,12 +67,12 @@ public class ExceptionsMapper {
 		Log.error(ex);
 
 		DefaultResponse response = new DefaultResponse(
-			messages.failed_with(""),
+			messages.getMessage("failed_with"),
 			Response.Status.INTERNAL_SERVER_ERROR,
 			500
 		);
 
-		Log.warnf("returning status: %s with response: %s", response.status, messages.failed_with(""));
+		Log.warnf("returning status: %s with response: %s", response.status, response.getMessage());
 		return RestResponse.status(Response.Status.INTERNAL_SERVER_ERROR, response);
 	}
 

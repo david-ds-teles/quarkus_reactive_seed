@@ -3,12 +3,10 @@ package com.david.ds.teles.core.services;
 import com.david.ds.teles.core.domain.Account;
 import com.david.ds.teles.repository.AccountRepository;
 import com.david.ds.teles.utils.exceptions.MyExceptionError;
-import com.david.ds.teles.utils.i18n.AppMessages;
 import com.david.ds.teles.utils.logging.DefaultLogging.Logged;
 import com.david.ds.teles.utils.validator.MyValidatorGroups;
 import io.quarkus.hibernate.reactive.panache.common.runtime.ReactiveTransactional;
 import io.quarkus.logging.Log;
-import io.quarkus.qute.i18n.Localized;
 import io.smallrye.mutiny.Uni;
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -26,23 +24,16 @@ import javax.validation.groups.Default;
 public class AccountService {
 	private Validator validator;
 
-	private AppMessages messages;
-
 	private AccountRepository accountRepo;
 
-	public AccountService(
-		AccountRepository accountRepo,
-		Validator validator,
-		@Localized("pt-BR") AppMessages messages
-	) {
+	public AccountService(AccountRepository accountRepo, Validator validator) {
 		this.accountRepo = accountRepo;
 		this.validator = validator;
-		this.messages = messages;
 	}
 
 	@ReactiveTransactional
 	public Uni<Account> save(@Valid @ConvertGroup(to = Default.class) Account account) {
-		account.create(messages);
+		account.create();
 
 		Uni<Account> result =
 			this.accountRepo.persist(account)
@@ -50,7 +41,7 @@ public class AccountService {
 				.transform(
 					e -> {
 						Log.error("error traying to save an account", e);
-						return new MyExceptionError(messages.failed_with("SQL Error"), 500);
+						return new MyExceptionError(500, "failed_with", new String[] { "SQL Error" });
 					}
 				);
 
@@ -81,7 +72,7 @@ public class AccountService {
 				e -> {
 					Log.error("error traying to update an account", e);
 
-					return new MyExceptionError(messages.failed_with("SQL Error"), 500);
+					return new MyExceptionError(500, "failed_with", new String[] { "SQL Error" });
 				}
 			)
 			.onItem()
@@ -91,7 +82,7 @@ public class AccountService {
 
 					if (qtdUpdated <= 0) return Uni
 						.createFrom()
-						.failure(new MyExceptionError(messages.not_updated(), 404));
+						.failure(new MyExceptionError(404, "not_updated", null));
 
 					return Uni.createFrom().nullItem();
 				}

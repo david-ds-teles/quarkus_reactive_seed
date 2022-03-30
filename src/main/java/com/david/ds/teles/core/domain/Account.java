@@ -1,7 +1,6 @@
 package com.david.ds.teles.core.domain;
 
 import com.david.ds.teles.utils.exceptions.MyExceptionError;
-import com.david.ds.teles.utils.i18n.AppMessages;
 import com.david.ds.teles.utils.validator.MyValidatorGroups;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -41,12 +40,12 @@ public class Account {
 	@PastOrPresent(groups = { MyValidatorGroups.Update.class })
 	private OffsetDateTime updatedAt;
 
-	public void create(AppMessages message) {
-		if (this.email == null) throw new MyExceptionError(message.invalid_email(email));
+	public void create() {
+		if (this.email == null) throw new MyExceptionError("invalid_email", new String[] { email });
 
 		Pattern p = Pattern.compile("^.+@foo\\.com");
 		Matcher m = p.matcher(this.email);
 
-		if (m.matches()) throw new MyExceptionError(message.invalid_email(email));
+		if (m.matches()) throw new MyExceptionError("invalid_email", new String[] { email });
 	}
 }
