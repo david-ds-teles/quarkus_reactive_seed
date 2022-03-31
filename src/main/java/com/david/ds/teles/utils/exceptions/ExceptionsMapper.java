@@ -4,22 +4,21 @@ import com.david.ds.teles.utils.i18n.AppMessages;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import io.quarkus.logging.Log;
-import io.quarkus.qute.i18n.Localized;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.inject.Inject;
 import javax.validation.ConstraintViolationException;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.jboss.resteasy.reactive.RestResponse;
 import org.jboss.resteasy.reactive.server.ServerExceptionMapper;
 
 public class ExceptionsMapper {
-	@Inject
-	@Localized("pt-BR")
 	private AppMessages messages;
+
+	public ExceptionsMapper(AppMessages messages) {
+		this.messages = messages;
+	}
 
 	@ServerExceptionMapper
 	public RestResponse<DefaultResponse> constraintViolation(ConstraintViolationException ex) {
@@ -28,20 +27,15 @@ public class ExceptionsMapper {
 		List<String> violations = ex
 			.getConstraintViolations()
 			.stream()
-			.map(v -> v.getPropertyPath() + " " + v.getMessage())
+			.map(v -> v.getPropertyPath().toString() + " " + v.getMessage())
 			.collect(Collectors.toList());
 
-		DefaultResponse response = new DefaultResponse(
-			messages.invalid_data(),
-			violations,
-			Response.Status.BAD_REQUEST,
-			Response.Status.BAD_REQUEST.getStatusCode()
-		);
+		DefaultResponse response = new DefaultResponse(messages.getMessage("invalid_data"), violations);
 
 		Log.warnf(
 			"returning %s with response: %s to invalid data: %s",
-			response.status,
-			messages.invalid_data(),
+			Response.Status.BAD_REQUEST,
+			messages.getMessage("invalid_data"),
 			violations
 		);
 
@@ -53,12 +47,9 @@ public class ExceptionsMapper {
 		Log.warn("a MyExceptionError has been caught");
 
 		Response.Status status = Response.Status.fromStatusCode(ex.getStatus());
-
-		Log.warnf("returning status: %s with response: %s", status, ex.getMessage());
-		return RestResponse.status(
-			status,
-			new DefaultResponse(ex.getMessage(), status, ex.getStatus())
-		);
+		String message = messages.getMessage(ex.getMessageKey(), ex.getMessageArgs());
+		Log.warnf("returning status: %s with response: %s", status, message);
+		return RestResponse.status(status, new DefaultResponse(message));
 	}
 
 	@ServerExceptionMapper
@@ -67,12 +58,14 @@ public class ExceptionsMapper {
 		Log.error(ex);
 
 		DefaultResponse response = new DefaultResponse(
-			messages.failed_with(""),
-			Response.Status.INTERNAL_SERVER_ERROR,
-			500
+			messages.getMessage("failed_with", "internal error")
 		);
 
-		Log.warnf("returning status: %s with response: %s", response.status, messages.failed_with(""));
+		Log.warnf(
+			"returning status: %s with response: %s",
+			Response.Status.INTERNAL_SERVER_ERROR,
+			response.getMessage()
+		);
 		return RestResponse.status(Response.Status.INTERNAL_SERVER_ERROR, response);
 	}
 
@@ -82,13 +75,9 @@ public class ExceptionsMapper {
 	static class DefaultResponse {
 		public String message;
 		public List<String> details;
-		public Response.Status status;
-		public Integer statusCode;
 
-		public DefaultResponse(String message, Status status, Integer statusCode) {
+		public DefaultResponse(String message) {
 			this.message = message;
-			this.status = status;
-			this.statusCode = statusCode;
 		}
 	}
 }
