@@ -3,6 +3,7 @@ package com.david.ds.teles.utils.i18n;
 import com.david.ds.teles.utils.exceptions.MyExceptionError;
 import com.david.ds.teles.utils.http.HttpLangInterceptor;
 import io.quarkus.qute.i18n.Localized;
+import io.quarkus.qute.i18n.MessageBundles;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -23,21 +24,12 @@ public class DefaultAppMessages implements AppMessages {
 
 	private Locale currentLocale;
 
-	private Map<Locale, I18nMessages> bundles;
-
 	private Map<String, Function<String[], String>> commands;
 
 	@Inject
-	public DefaultAppMessages(
-		I18nMessages defaultMessages,
-		@Localized("pt-BR") I18nMessages ptBRMessages
-	) {
+	public DefaultAppMessages(I18nMessages defaultMessages) {
 		this.currentLocale = Locale.getDefault();
 		this.current = defaultMessages;
-
-		this.bundles = new HashMap<>();
-		this.bundles.put(Locale.getDefault(), defaultMessages);
-		this.bundles.put(new Locale("pt_BR"), ptBRMessages);
 
 		// need to register commands with the same messages methods to be executed only
 		// using their respective keys.
@@ -52,7 +44,7 @@ public class DefaultAppMessages implements AppMessages {
 	}
 
 	@Override
-	public String getMessage(String key, String[] params) {
+	public String getMessage(String key, String... params) {
 		if (!this.commands.containsKey(key)) throw new MyExceptionError(
 			"no message registered with key: " + key
 		);
@@ -70,21 +62,22 @@ public class DefaultAppMessages implements AppMessages {
 	@Override
 	public void setLocale(Locale locale) {
 		if (locale == null) {
-			this.current = this.bundles.get(Locale.getDefault());
+			this.current = MessageBundles.get(I18nMessages.class);
 			return;
 		}
 
-		if (locale.toString().toUpperCase().equals(this.currentLocale.toString().toUpperCase())) return;
+		if (locale.equals(this.currentLocale)) return;
 
 		this.currentLocale = locale;
 
-		if (this.bundles.containsKey(locale)) {
-			this.current = this.bundles.get(locale);
-		} else {
-			this.current = this.bundles.get(Locale.getDefault());
+		try {
+			this.current =
+				MessageBundles.get(
+					I18nMessages.class,
+					Localized.Literal.of(this.currentLocale.getLanguage())
+				);
+		} catch (Exception e) {
+			this.current = MessageBundles.get(I18nMessages.class);
 		}
-		// should work, but quarkus throw an exception
-		//		this.current = MessageBundles.get(I18nMessages.class,
-		//				Localized.Literal.of(this.currentLocale.getLanguage() + "-" + this.currentLocale.getCountry()));
 	}
 }
